@@ -1,4 +1,6 @@
-#include <cstdint>
+//#include <cstdint>
+#include <iostream>
+#include <fstream>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -14,8 +16,10 @@ PCLCloud::Ptr temp_cloud(new PCLCloud);
 PCLCloud::Ptr full_cloud(new PCLCloud);
 PCLCloud::Ptr cloud_xyzrgb(new PCLCloud);
 
+std::ofstream myfile;
+
 std::string pc2_topic_in = "/rplidar/cloud_color";
-std::string save_to_dir = "/home/arc/";
+std::string save_as = "/home/arc/clouds/test/cloud.txt";
 
 void unpackRGB(){
     cloud_xyzrgb->points.resize(temp_cloud->size());
@@ -49,28 +53,31 @@ void unpackRGB(){
     }
 }
 
+void writeXYZRGB(){
+    
+    std::string x, y, z, r, g, b;
+    auto pt = temp_cloud->points.begin();
+    while( pt != temp_cloud->points.end() ) {
+        x = std::to_string(pt->x) + " ";
+        y = std::to_string(pt->y) + " ";
+        z = std::to_string(pt->z) + " ";
+        r = std::to_string(pt->r) + " ";
+        g = std::to_string(pt->g) + " ";
+        b = std::to_string(pt->b) + " ";
+        
+        myfile.open( save_as , std::ios_base::app);
+        myfile << (x + y + z + r + g + b + "\n");
+        myfile.close();
+        ++pt;
+    }
+    ROS_INFO( "pc2_record: ending write" );
+}
+
 void pc2Callback( const sensor_msgs::PointCloud2::ConstPtr& msg ) {
     ROS_INFO( "pc2_record: Cloud callabck" );
-    
-    
-    pcl_conversions::toPCL(*msg, *pcl_pc2_temp); //nescessary
+    pcl_conversions::toPCL(*msg, *pcl_pc2_temp);
     pcl::fromPCLPointCloud2(*pcl_pc2_temp, *temp_cloud);
-    unpackRGB();
-    //copyPointCloud(cloud_xyz, cloud_xyzrgb);
-    /*
-    int r = temp_cloud->points[0].r;
-    int g = temp_cloud->points[0].g;
-    int b = temp_cloud->points[0].b;
-    */
-    int r = cloud_xyzrgb->points[0].r;
-    int g = cloud_xyzrgb->points[0].g;
-    int b = cloud_xyzrgb->points[0].b;
-    
-    std::cout << r << " " << g << " " << b << std::endl;
-    
-    //do stuff with temp_cloud here
-    //pcl::concatenatePointCloud(*pcl_pc2_full, *pcl_pc2_temp, *pcl_pc2_full);
-    
+    writeXYZRGB();
 }
 
 
@@ -83,14 +90,13 @@ int main( int argc, char **argv ) {
     
     ROS_INFO( "pc2_record: Obtaining Params" );
     nh.getParam("pc2_topic_in", pc2_topic_in );
+    nh.getParam("save_as", save_as );
     
     ROS_INFO( "pc2_record: Configuring Node" );
     sub = nh.subscribe( pc2_topic_in, 10, pc2Callback );
     
     ROS_INFO( "pc2_record: Starting Spin" );
-    //ros::spinOnce();
     ros::spin();
-    pcl::PCDWriter obj;
-    obj.writeASCII("/home/arc/clouds/test/cloud.pcd", *cloud_xyzrgb );
+    
     return 0;
 }
