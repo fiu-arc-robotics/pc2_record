@@ -99,7 +99,8 @@ void boolCallback( const std_msgs::Bool::ConstPtr& msg ) {
 
 void startStopCallback( const std_msgs::Bool::ConstPtr& msg ) {
     bool newstate = msg->data;
-    if(newstate != current_recording_state) { 
+    if(newstate != current_recording_state) {
+	current_recording_state = newstate; 
         if(newstate == true) {
             filename = makeTime();
             is_PauseRecording = false;
@@ -133,10 +134,10 @@ int main( int argc, char **argv ) {
     sub_bool_start = nh.subscribe( "/start_stop", 10, startStopCallback);
     
     //File opening test
-    std::string filepath = makeFilepath();
-    myfile.open(filepath, std::ios_base::app);
-    myfile << "Hello World!" << std::endl;
-    myfile.close();
+    //std::string filepath = makeFilepath();
+    //myfile.open(filepath, std::ios_base::app);
+    //myfile << "Hello World!" << std::endl;
+    //myfile.close();
     
     ROS_INFO( "pc2_record: Starting Spin" );
     std::cout<< makeFilepath() << std::endl;

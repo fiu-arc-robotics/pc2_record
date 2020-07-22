@@ -1,13 +1,11 @@
 <!--
 Launch file for pc2_record node:
   Records point clouds in their own reference frames
-NOTES:
-  /is_PauseRecording: if this bool topic is true the node will pause recorting untill false again  
 -->
 
 <launch>
   <node name="pc2_record" pkg="pc2_record" type="pc2_record" output="screen" >
-    <param name="pc2_topic_in"   type="string"  value="/rplidar/cloud" />
-    <param name="save_to"        type="string"  value="/home/lattice/Desktop/" />
+    <param name="pc2_topic_in"   type="string"  value="/rplidar/cloud_color" />
+    <param name="save_to"        type="string"  value="/home/arc/Desktop/" />
   </node>
 </launch>
