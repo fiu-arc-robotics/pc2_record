@@ -7,8 +7,7 @@ NOTES:
 
 <launch>
   <node name="pc2_record" pkg="pc2_record" type="pc2_record" output="screen" >
-    <param name="pc2_topic_in"   type="string"  value="/cloud_color" />
-<!--    <param name="bool_topic_in"  type="string"  value="/is_PauseRecording" /> -->
-    <param name="save_as"        type="string"  value="~/Desktop/cloud.txt" />
+    <param name="pc2_topic_in"   type="string"  value="/rplidar/cloud" />
+    <param name="save_to"        type="string"  value="/home/lattice/Desktop/" />
   </node>
 </launch>
